@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<net name="detokenizer" version="11">
+	<layers>
+		<layer id="0" name="Parameter_20" type="Parameter" version="opset1">
+			<data shape="?,?" element_type="i64" />
+			<output>
+				<port id="0" precision="I64" names="Parameter_20">
+					<dim>-1</dim>
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="1" name="Constant_2" type="Const" version="opset1">
+			<data element_type="u8" shape="379758" offset="0" size="379758" />
+			<output>
+				<port id="0" precision="U8">
+					<dim>379758</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="2" name="Convert_36" type="Convert" version="opset1">
+			<data destination_type="i32" />
+			<input>
+				<port id="0" precision="I64">
+					<dim>-1</dim>
+					<dim>-1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1" precision="I32">
+					<dim>-1</dim>
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="3" name="SentencepieceDetokenizer_21" type="SentencepieceDetokenizer" version="extension">
+			<input>
+				<port id="0" precision="U8">
+					<dim>379758</dim>
+				</port>
+				<port id="1" precision="I32">
+					<dim>-1</dim>
+					<dim>-1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="3" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="4" precision="U8">
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="4" name="Constant_23" type="Const" version="opset1">
+			<data element_type="u8" shape="51" offset="379758" size="51" />
+			<output>
+				<port id="0" precision="U8">
+					<dim>51</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="5" name="Constant_25" type="Const" version="opset1">
+			<data element_type="u8" shape="2" offset="379809" size="2" />
+			<output>
+				<port id="0" precision="U8">
+					<dim>2</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="6" name="RegexNormalization_26" type="RegexNormalization" version="extension">
+			<data global_replace="true" />
+			<input>
+				<port id="0" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="1" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="2" precision="U8">
+					<dim>-1</dim>
+				</port>
+				<port id="3" precision="U8">
+					<dim>51</dim>
+				</port>
+				<port id="4" precision="U8">
+					<dim>2</dim>
+				</port>
+			</input>
+			<output>
+				<port id="5" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="6" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="7" precision="U8">
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="7" name="UTF8Validate_27" type="UTF8Validate" version="extension">
+			<data replace_mode="true" />
+			<input>
+				<port id="0" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="1" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="2" precision="U8">
+					<dim>-1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="3" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="4" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="5" precision="U8">
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="8" name="StringTensorPack_28" type="StringTensorPack" version="extension">
+			<data mode="begins_ends" />
+			<input>
+				<port id="0" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="1" precision="I32">
+					<dim>-1</dim>
+				</port>
+				<port id="2" precision="U8">
+					<dim>-1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="3" precision="STRING" names="string_output">
+					<dim>-1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="9" name="Result_29" type="Result" version="opset1">
+			<input>
+				<port id="0" precision="STRING">
+					<dim>-1</dim>
+				</port>
+			</input>
+		</layer>
+	</layers>
+	<edges>
+		<edge from-layer="0" from-port="0" to-layer="2" to-port="0" />
+		<edge from-layer="1" from-port="0" to-layer="3" to-port="0" />
+		<edge from-layer="2" from-port="1" to-layer="3" to-port="1" />
+		<edge from-layer="3" from-port="2" to-layer="6" to-port="0" />
+		<edge from-layer="3" from-port="3" to-layer="6" to-port="1" />
+		<edge from-layer="3" from-port="4" to-layer="6" to-port="2" />
+		<edge from-layer="4" from-port="0" to-layer="6" to-port="3" />
+		<edge from-layer="5" from-port="0" to-layer="6" to-port="4" />
+		<edge from-layer="6" from-port="5" to-layer="7" to-port="0" />
+		<edge from-layer="6" from-port="6" to-layer="7" to-port="1" />
+		<edge from-layer="6" from-port="7" to-layer="7" to-port="2" />
+		<edge from-layer="7" from-port="3" to-layer="8" to-port="0" />
+		<edge from-layer="7" from-port="4" to-layer="8" to-port="1" />
+		<edge from-layer="7" from-port="5" to-layer="8" to-port="2" />
+		<edge from-layer="8" from-port="3" to-layer="9" to-port="0" />
+	</edges>
+	<rt_info>
+		<add_attention_mask value="True" />
+		<add_prefix_space value="True" />
+		<add_special_tokens value="True" />
+		<chat_template value="{% for message in messages %}{{'&lt;|im_start|>' + message['role'] + '&#10;' + message['content'] + '&lt;|im_end|>' + '&#10;'}}{% endfor %}{% if add_generation_prompt %}{{ '&lt;|im_start|>assistant&#10;' }}{% endif %}" />
+		<clean_up_tokenization_spaces value="True" />
+		<detokenizer_input_type value="i64" />
+		<eos_token_id value="2" />
+		<handle_special_tokens_with_re value="False" />
+		<number_of_inputs value="1" />
+		<openvino_tokenizers_version value="2024.6.0.0" />
+		<openvino_version value="2024.6.0" />
+		<original_tokenizer_class value="&lt;class 'transformers.models.t5.tokenization_t5_fast.T5TokenizerFast'>" />
+		<pad_token_id value="25155" />
+		<sentencepiece_version value="0.2.0" />
+		<skip_special_tokens value="True" />
+		<streaming_detokenizer value="False" />
+		<tiktoken_version value="0.8.0" />
+		<tokenizer_output_type value="i64" />
+		<tokenizers_version value="0.19.1" />
+		<transformers_version value="4.40.1" />
+		<use_max_padding value="False" />
+		<use_sentencepiece_backend value="False" />
+		<utf8_replace_mode value="replace" />
+		<with_detokenizer value="True" />
+	</rt_info>
+</net>
