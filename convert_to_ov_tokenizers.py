@@ -1,3 +1,8 @@
+"""
+To convert a SentencePiece tokenizer to an OpenVINO (OV) tokenizer, you first need to convert the SentencePiece tokenizer to the HuggingFace AutoTokenizer. 
+The simplest bypass is to use T5TokenizerFast to load the SentencePiece tokenizer and then save it. 
+This way, it becomes a HuggingFace tokenizer because T5 directly uses the SentencePiece as tokenizer.
+"""
 from transformers import T5TokenizerFast
 tokenizer = T5TokenizerFast("/home/qiu/SenseVoice/ov_models/chn_jpn_yue_eng_ko_spectok.bpe.model")
 text = "<|zh|><|NEUTRAL|><|Speech|><|woitn|>开饭时间早上九点至下午五点"
