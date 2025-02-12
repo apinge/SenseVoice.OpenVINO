@@ -12,6 +12,7 @@ import librosa
 import numpy as np
 from pathlib import Path
 from typing import List, Union, Tuple
+import openvino_tokenizers 
 
 from funasr_onnx.utils.utils import (
     # CharTokenizer,
@@ -25,6 +26,9 @@ from funasr_onnx.utils.utils import (
 from funasr_onnx.utils.sentencepiece_tokenizer import SentencepiecesTokenizer
 from funasr_onnx.utils.frontend import WavFrontend
 import openvino as ov
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+import time
 logging = get_logger()
 
 
@@ -58,12 +62,10 @@ class SenseVoiceSmallOV:
                 raise "model_dir must be model_name in modelscope or local path downloaded from modelscope, but is {}".format(
                     model_dir
                 )
-
+        core = ov.Core()
         model_file = os.path.join(model_dir, "model.xml")
         if quantize:
             model_file = os.path.join(model_dir, "model_quant.xml")
-        if not os.path.exists(model_file):
-            print(".xml does not exist, begin to export onnx")
             # try:
             #     from funasr import AutoModel
             # except:
@@ -79,14 +81,13 @@ class SenseVoiceSmallOV:
         self.tokenizer = SentencepiecesTokenizer(
             bpemodel=os.path.join(model_dir, "chn_jpn_yue_eng_ko_spectok.bpe.model")
         )
+        self.ov_detokenizer = ov.compile_model(os.path.join(model_dir, "openvino_detokenizer.xml"))
         config["frontend_conf"]["cmvn_file"] = cmvn_file
         self.frontend = WavFrontend(**config["frontend_conf"])
         core = ov.Core()
-        # self.ort_infer = OrtInferSession(
-        #     model_file, device_id, intra_op_num_threads=intra_op_num_threads
-        # )
-        
+        print(f"===load model {model_file}===")
         self.infer_reqeust = core.compile_model(model_file).create_infer_request()
+        print("===compiled_model succeed===")
         self.batch_size = batch_size
         self.blank_id = 0
         self.lid_dict = {"auto": 0, "zh": 3, "en": 4, "yue": 7, "ja": 11, "ko": 12, "nospeech": 13}
@@ -155,10 +156,10 @@ class SenseVoiceSmallOV:
         language_input = kwargs.get("language", "auto")
         textnorm_input = kwargs.get("textnorm", "woitn")
         language_list, textnorm_list = self.read_tags(language_input, textnorm_input)
-        
+        print(f"self.frontend.opts.frame_opts.samp_freq===={self.frontend.opts.frame_opts.samp_freq}")
         waveform_list = self.load_data(wav_content, self.frontend.opts.frame_opts.samp_freq)
         waveform_nums = len(waveform_list)
-        
+
         assert len(language_list) == 1 or len(language_list) == waveform_nums, \
             "length of parsed language list should be 1 or equal to the number of waveforms"
         assert len(textnorm_list) == 1 or len(textnorm_list) == waveform_nums, \
@@ -192,8 +193,8 @@ class SenseVoiceSmallOV:
 
                 mask = yseq != self.blank_id
                 token_int = yseq[mask].tolist()
-
-                asr_res.append(self.tokenizer.decode(token_int))
+                token_int = torch.tensor(token_int).unsqueeze(0)
+                asr_res.append(self.ov_detokenizer(token_int)["string_output"][0])
 
         return asr_res
 
@@ -248,16 +249,26 @@ class SenseVoiceSmallOV:
         return ctc_logits, encoder_out_lens
 
 
+from pydub import AudioSegment
+
+def get_wav_duration(filepath):
+    audio = AudioSegment.from_file(filepath)
+    return len(audio) / 1000  # pydub returns duration in milliseconds
 
 def main():
     #model_dir = "iic/SenseVoiceSmall"
-    model_dir = "/home/qiu/SenseVoice/ov_models"
+    model_dir = "ov_models"
     model = SenseVoiceSmallOV(model_dir, batch_size=10, quantize=False)
 
     # inference
-    wav_or_scp = ["/ov_models/example/yue.mp3"]
+    wav_or_scp = ["ov_models/example/zh.mp3"]
+    speech_len = get_wav_duration(wav_or_scp[0])
 
+    start_time = time.time()
     res = model(wav_or_scp, language="auto", use_itn=True)
+
+    print('yield speech len {}, rtf {}'.format(speech_len, (time.time() - start_time) / speech_len))
+
     print([rich_transcription_postprocess(i) for i in res])
     print("====ov infer succeed====")
 if __name__ == "__main__":
