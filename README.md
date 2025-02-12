@@ -1,5 +1,8 @@
 ([简体中文](./README_zh.md)|English|[日本語](./README_ja.md))
 
+<details>
+  <summary>Click here to expand/collapse content</summary>
+  <ul>
 
 # Introduction
 
@@ -380,3 +383,17 @@ You can also scan the following DingTalk group QR code to join the community gro
 | <img src="image/dingding_funasr.png" width="250"/></div> |
 
 
+  </ul>
+</details>
+
+## Update Notes
+### 2025/02/12
+Enabled the model and tokenizer with OpenVINO IR
+
+## Installation & Usage
+```
+pip install -r requirements.txt
+chmod +x ov_models/combine_model.sh
+./ov_models/combine_model.sh
+python ov_infer.py
+```
