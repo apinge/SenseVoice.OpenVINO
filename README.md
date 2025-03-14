@@ -397,3 +397,17 @@ chmod +x ov_models/combine_model.sh
 ./ov_models/combine_model.sh
 python ov_infer.py
 ```
+
+## Install ffmpeg
+If you meet problem like
+```
+RuntimeWarning: Couldn't find ffprobe or avprobe - defaulting to ffprobe, but may not work
+```
+It means ffmpeg is missing.
+
+on ubuntu you can
+```
+sudo apt update && sudo apt install ffmpeg
+```
+on windows, you can download from https://github.com/BtbN/FFmpeg-Builds/releases
+and add the path like `C:\ffmpeg\bin` by `edit the system environment variables` ->`Environment Variables` -> `Path`
