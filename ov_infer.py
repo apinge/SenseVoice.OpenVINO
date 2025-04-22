@@ -78,15 +78,15 @@ class SenseVoiceSmallOV:
         cmvn_file = os.path.join(model_dir, "am.mvn")
         config = read_yaml(config_file)
 
-        self.tokenizer = SentencepiecesTokenizer(
-            bpemodel=os.path.join(model_dir, "chn_jpn_yue_eng_ko_spectok.bpe.model")
-        )
+        # self.tokenizer = SentencepiecesTokenizer(
+        #     bpemodel=os.path.join(model_dir, "chn_jpn_yue_eng_ko_spectok.bpe.model")
+        # )
         self.ov_detokenizer = ov.compile_model(os.path.join(model_dir, "openvino_detokenizer.xml"))
         config["frontend_conf"]["cmvn_file"] = cmvn_file
         self.frontend = WavFrontend(**config["frontend_conf"])
         core = ov.Core()
         print(f"===load model {model_file}===")
-        self.infer_reqeust = core.compile_model(model_file).create_infer_request()
+        self.infer_reqeust = core.compile_model(model_file, "GPU").create_infer_request()
         print("===compiled_model succeed===")
         self.batch_size = batch_size
         self.blank_id = 0
@@ -188,6 +188,7 @@ class SenseVoiceSmallOV:
                     ctc_logits = torch.from_numpy(ctc_logits).float()
                 # support batch_size=1 only currently
                 x = ctc_logits[b, : encoder_out_lens[b].item(), :]
+                print(x)
                 yseq = x.argmax(dim=-1)
                 yseq = torch.unique_consecutive(yseq, dim=-1)
 
@@ -261,7 +262,7 @@ def main():
     model = SenseVoiceSmallOV(model_dir, batch_size=10, quantize=False)
 
     # inference
-    wav_or_scp = ["ov_models/example/zh.mp3"]
+    wav_or_scp = ["example/enNews.wav"]
     speech_len = get_wav_duration(wav_or_scp[0])
 
     start_time = time.time()
