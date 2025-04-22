@@ -63,7 +63,7 @@ class SenseVoiceSmallOV:
                     model_dir
                 )
         core = ov.Core()
-        model_file = os.path.join(model_dir, "model.xml")
+        model_file = os.path.join(model_dir, "openvino_model.xml")
         if quantize:
             model_file = os.path.join(model_dir, "model_quant.xml")
             # try:
@@ -258,7 +258,7 @@ def get_wav_duration(filepath):
 
 def main():
     #model_dir = "iic/SenseVoiceSmall"
-    model_dir = "ov_models"
+    model_dir = "sensevoice-small-ov"
     model = SenseVoiceSmallOV(model_dir, batch_size=10, quantize=False)
 
     # inference
