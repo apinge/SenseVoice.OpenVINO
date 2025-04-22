@@ -392,9 +392,10 @@ Enabled the model and tokenizer with OpenVINO IR
 
 ## Installation & Usage
 ```
+git clone https://github.com/apinge/SenseVoice.OpenVINO.git
+cd SenseVoice.OpenVINO
 pip install -r requirements.txt
-chmod +x ov_models/combine_model.sh
-./ov_models/combine_model.sh
+git clone https://huggingface.co/apinge/sensevoice-small-ov
 python ov_infer.py
 ```
 
