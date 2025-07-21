@@ -389,7 +389,8 @@ You can also scan the following DingTalk group QR code to join the community gro
 ## Update Notes
 ### 2025/02/12
 Enabled the model and tokenizer with OpenVINO IR
-
+### 2025/05/28
+Compressed the model weights to int4 format [apinge/sensevoice-small-int4-asym-ov](https://huggingface.co/apinge/sensevoice-small-int4-asym-ov)
 ## Installation & Usage
 ```
 git clone https://github.com/apinge/SenseVoice.OpenVINO.git
@@ -398,6 +399,11 @@ pip install -r requirements.txt
 git clone https://huggingface.co/apinge/sensevoice-small-ov
 python ov_infer.py
 ```
+You can also use the quantized model. To do so, please use the following command to clone the quantized model instead of the original one:
+```
+git clone https://huggingface.co/apinge/sensevoice-small-int4-asym-ov
+```
+
 
 ## Install ffmpeg
 If you meet problem like
