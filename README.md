@@ -403,7 +403,16 @@ You can also use the quantized model. To do so, please use the following command
 ```
 git clone https://huggingface.co/apinge/sensevoice-small-int4-asym-ov
 ```
+### How to quantize
+If you want to try compressing it yourself, we recommend using NNCF INT4 compression. We suggest using the following code:
+```python
+ ov_compressed_model = nncf.compress_weights(ov_model, mode =  nncf.CompressWeightsMode.INT4_ASYM, 
+                                                #avoid the issue 'Channel size 560 should be divisible by size of group 128'.
+                                                ignored_scope=nncf.IgnoredScope(names=["/encoder/encoders0.0/self_attn/linear_q_k_v/MatMul"]
 
+    ))
+    ov.save_model(ov_compressed_model, os.path.join(model_dir, "openvino_model_int4_asym.xml")) 
+```
 
 ## Install ffmpeg
 If you meet problem like
